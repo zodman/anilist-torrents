@@ -35,7 +35,7 @@ app.controller("MainController", function ($scope, $http) {
         set: function (group) {
           var notes = /^(?:\[(.*?)\])?(.*)/.exec(this.notes || "")[2];
           if (group && group.name) notes = "[" + group.name + "]" + notes;
-          if (!notes) notes = " "; // Force it to be SOMETHING
+          if (!notes) notes = "\u200B"; // Force it to be SOMETHING
           this.notes = notes;
 
           // Persist the changes upstream

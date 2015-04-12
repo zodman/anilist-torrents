@@ -9,6 +9,10 @@ html, body {
     font-family: "Open Sans", sans-serif;
 }
 
+body {
+    padding-bottom: 100px;
+}
+
 a {
     color: #106655;
     text-decoration: none;
@@ -33,6 +37,14 @@ a {
 }
 .loading h1 {
     font-style: italic;
+}
+
+.title {
+    font-size: 64px;
+    text-align: center;
+}
+.title img {
+    vertical-align: middle;
 }
 
 .show {
@@ -134,4 +146,22 @@ a {
 .show .loaded,
 .show-episodes {
     width: 600px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding-top: 6px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 30px;
+    font-style: italic;
+
+    background: -moz-linear-gradient(top,  rgba(251,251,251,0) 0%, rgba(251,251,251,1) 30%, rgba(251,251,251,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(251,251,251,0)), color-stop(30%,rgba(251,251,251,1)), color-stop(100%,rgba(251,251,251,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(251,251,251,0) 0%,rgba(251,251,251,1) 30%,rgba(251,251,251,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(251,251,251,0) 0%,rgba(251,251,251,1) 30%,rgba(251,251,251,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(251,251,251,0) 0%,rgba(251,251,251,1) 30%,rgba(251,251,251,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(251,251,251,0) 0%,rgba(251,251,251,1) 30%,rgba(251,251,251,1) 100%); /* W3C */
 }

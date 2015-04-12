@@ -29,6 +29,11 @@
       </div>
 
       <div ng-show="user">
+        <h1 class="title">
+          Torrents for {{user.display_name}}
+          <img src="{{user.image_url_med}}">
+        </h1>
+
         <div class="show" ng-repeat="show in user.list | orderBy:'anime.title'" ng-class="{'no-groups': no_groups(show), 'no-episodes': no_episodes(show)}">
           <div class="show-title">
             <a href="http://anilist.co/anime/{{show.anime.id}}">
@@ -68,6 +73,10 @@
         </div>
       </div>
     </div>
+
+    <footer>
+      Submit feedback on <a href="https://github.com/Fugiman/anilist-torrents/issues">Github</a> or <a href="https://twitter.com/fugiman">Twitter</a>
+    </footer>
 
     <script>
       (function(w,d,s,i,u,a,k,n,e,p){w[n]=w[n]||[];
