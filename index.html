@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Anilist Torrents</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/index.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.6.0/lodash.min.js"></script>
+    <script src="/static/index.js"></script>
+  </head>
+  <body ng-controller="MainController">
+    <div class="loading" ng-show="loading">
+      <video src="/static/loading.mp4" autoplay loop></video>
+      <h1>Loading</h1>
+    </div>
+
+    <div ng-show="!loading">
+      <div class="login" ng-show="!user">
+        <a href="/login">Log In with your Anilist account</a>.
+        <em>This allows us to pull down only the torrents &amp; groups you care about.</em>
+      </div>
+
+      <div ng-show="user">
+        <div class="show" ng-repeat="show in user.list | orderBy:'anime.title'" ng-class="{'no-groups': no_groups(show), 'no-episodes': no_episodes(show)}">
+          <div class="show-title">
+            <a href="http://anilist.co/anime/{{show.anime.id}}">
+              <img src="{{show.anime.image_url_lge}}">
+              <h1>{{show.anime.title}}</h1>
+            </a>
+            <div class="show-group" ng-click="show.group=''" ng-class="{'a-plus': show.group.a_plus, 'trusted': show.group.trusted, 'remake': show.group.remake}">
+              <strong>{{show.group.name}}</strong>
+              <em>{{show.group.downloads | number}}</em>
+            </div>
+            <em class="no-groups">No groups have subbed this show yet.</em>
+            <em class="no-episodes">No unwatched episodes are available yet.</em>
+          </div>
+
+          <div class="loading" ng-show="show.loading">
+            <video src="/static/loading.mp4" autoplay loop></video>
+            <h1>Loading</h1>
+          </div>
+
+          <div class="loaded" ng-show="!show.loading">
+            <div class="show-groups" ng-show="!show.group">
+              <div class="show-group" ng-click="show.group=group" ng-repeat="group in show.groups | orderBy:'name'" ng-class="{'a-plus': group.a_plus, 'trusted': group.trusted, 'remake': group.remake}">
+                <strong>{{group.name}}</strong>
+                <em>{{group.downloads | number}}</em>
+              </div>
+            </div>
+
+            <div class="show-episodes" ng-show="show.group">
+              <div ng-repeat="episode in show.group.episodes | filter:unwatched | orderBy:'-uploaded'">
+                <a class="show-episode" href="{{episode.download}}" ng-class="{'a-plus': episode.a_plus, 'trusted': episode.trusted, 'remake': episode.remake}">
+                  <strong>{{episode.name}}</strong>
+                  <em>{{episode.downloads | number}}</em>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function(w,d,s,i,u,a,k,n,e,p){w[n]=w[n]||[];
+      e=d.createElement(s);e.async=1;e.id=i;e.setAttribute(a,k);e.src=u;
+      m=d.getElementsByTagName(s)[0];m.parentNode.insertBefore(e,m);})
+      (window,document,'script','gauges-tracker','//secure.gaug.es/track.js','data-site-id','552a026992c6ac31d700222a','_gauges');
+    </script>
+  </body>
+</html>

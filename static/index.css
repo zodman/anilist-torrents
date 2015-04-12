@@ -1,0 +1,142 @@
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    color: #111111;
+    background: #FBFBFB;
+    font-family: "Open Sans", sans-serif;
+}
+
+a {
+    color: #106655;
+    text-decoration: none;
+}
+
+video {
+    height: 480px;
+    width: 360px;
+}
+
+.a-plus {
+    background: #60B0F0 !important;
+}
+
+.trusted {
+    background: #98D9A8;
+}
+
+.remake {
+    background: #F0B080;
+}
+
+.loading,
+.login {
+    margin-top: 100px;
+    text-align: center;
+}
+.loading h1 {
+    font-style: italic;
+}
+
+.show {
+    margin: 20px auto;
+    padding: 20px;
+    background: #DDD;
+    border-radius: 40px;
+    max-width: 960px;
+}
+
+.show-title,
+.show .loading,
+.show .loaded,
+.show-groups,
+.show-episodes {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    width: 300px;
+    margin: 0;
+}
+.show-title h1 {
+    color: #111111;
+}
+
+.show.no-groups,
+.show.no-episodes {
+    opacity: 0.3;
+}
+
+.show.no-groups .show-title,
+.show.no-episodes .show-title {
+    display: block;
+    height: 80px; /* Lie so things look right */
+    width: 100%;
+}
+.show.no-groups .show-title *,
+.show.no-episodes .show-title * {
+    display: inline-block;
+    vertical-align: middle;
+}
+.show.no-groups .show-title a,
+.show.no-episodes .show-title a {
+    width: 300px;
+    text-align: left;
+}
+.show.no-groups .show-title img,
+.show.no-episodes .show-title img {
+    height: 100px;
+}
+.show.no-groups .show-title h1,
+.show.no-episodes .show-title h1 {
+    margin: 0 10px;
+    width: 200px;
+    line-height: 20px;
+    font-size: 16px;
+}
+.show.no-groups .show-title .show-group,
+.show.no-episodes .show-title .show-group {
+    position: relative;
+    top: -1px;
+    padding: 0 8px;
+    width: 200px;
+}
+.show.no-groups .show-title em,
+.show.no-episodes .show-title em {
+    margin: 0 10px;
+}
+.show.no-groups .show-title .no-groups,
+.show.no-episodes .show-title .no-episodes {
+    display: inline !important;
+}
+.show-title .no-groups,
+.show-title .no-episodes,
+.show.no-groups .show-title .show-group em,
+.show.no-episodes .show-title .show-group em {
+    display: none !important;
+}
+
+.show-group,
+.show-episode {
+    display: block;
+    cursor: pointer;
+    padding: 8px 20px;
+    font-size: 16px;
+    line-height: 20px;
+}
+.show-group:hover,
+.show-episode:hover {
+    font-size: 18px;
+}
+.show-group em,
+.show-episode em {
+    font-size: 0.8em;
+    float: right;
+}
+
+.show .loading,
+.show .loaded,
+.show-episodes {
+    width: 600px;
+}
