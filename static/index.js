@@ -68,6 +68,9 @@ app.controller("MainController", function ($scope, $http) {
         });
       });
     });
+  }).error(function () {
+    $scope.loading = false;
+    // Login screen will automatically appear
   });
 
   $scope.unwatched = function (value, index, arr) {
