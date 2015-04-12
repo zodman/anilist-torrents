@@ -17,13 +17,14 @@
   </head>
   <body ng-controller="MainController">
     <div class="loading" ng-show="loading">
-      <video src="/static/loading.mp4" autoplay loop></video>
+      <img src="/static/loading.gif">
       <h1>Loading</h1>
     </div>
 
     <div ng-show="!loading">
       <div class="login" ng-show="!user">
-        <a href="/login">Log In with your Anilist account</a>.
+        <a href="/login"><h1>Log In with your Anilist account.</h1></a>
+        <br>
         <em>This allows us to pull down only the torrents &amp; groups you care about.</em>
       </div>
 
@@ -43,7 +44,7 @@
           </div>
 
           <div class="loading" ng-show="show.loading">
-            <video src="/static/loading.mp4" autoplay loop></video>
+            <img src="/static/loading.gif">
             <h1>Loading</h1>
           </div>
 

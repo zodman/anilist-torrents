@@ -47,26 +47,29 @@ app.controller("MainController", function ($scope, $http) {
       });
 
       show.loading = true;
-      $http.get("/api/show/" + show.anime.id + "/torrents").success(function (data) {
-        show.loading = false;
-        show.groups = _.map(data, function (episodes, name) {
-          var group = {
-            show: show, // Ensure groups have a reference to it's parent
-            name: name,
-            downloads: _.sum(episodes, "downloads"),
-            a_plus: _.any(episodes, "a_plus"),
-            trusted: _.any(episodes, "trusted"),
-            remake: _.any(episodes, "remake"),
-          };
-          // Ensure episodes have references to their parent group & show
-          group.episodes = _.map(episodes, function (episode) {
-            episode.show = show;
-            episode.group = group;
-            return episode;
+      // Let the DOM catch up...
+      setTimeout(function () {
+        $http.get("/api/show/" + show.anime.id + "/torrents").success(function (data) {
+          show.loading = false;
+          show.groups = _.map(data, function (episodes, name) {
+            var group = {
+              show: show, // Ensure groups have a reference to it's parent
+              name: name,
+              downloads: _.sum(episodes, "downloads"),
+              a_plus: _.any(episodes, "a_plus"),
+              trusted: _.any(episodes, "trusted"),
+              remake: _.any(episodes, "remake"),
+            };
+            // Ensure episodes have references to their parent group & show
+            group.episodes = _.map(episodes, function (episode) {
+              episode.show = show;
+              episode.group = group;
+              return episode;
+            });
+            return group;
           });
-          return group;
         });
-      });
+      }, 40);
     });
   }).error(function () {
     $scope.loading = false;
