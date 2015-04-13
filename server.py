@@ -7,6 +7,7 @@ import re
 import time
 import urllib
 from functools import wraps
+from xml.sax.saxutils import escape
 
 import requests
 from beaker.cache import CacheManager
@@ -15,8 +16,8 @@ from beaker.util import parse_cache_config_options
 from bs4 import BeautifulSoup
 
 from bottle import app as app_factory
-from bottle import (abort, delete, get, hook, post, redirect, request, run,
-                    static_file)
+from bottle import (abort, delete, get, hook, post, redirect, request,
+                    response, run, static_file)
 
 # Override Synonyms for when Anilist is just being dumb
 SYNONYMS = {
@@ -127,10 +128,11 @@ def login():
             "grant_type": "authorization_code",
             "client_id": CONFIG["client_id"],
             "client_secret": CONFIG["client_secret"],
-            "redirect_uri": CONFIG["redirect_uri"],
+            "redirect_uri": CONFIG["base_url"] + "/login",
             "code": code
         }, verify=False)
         data = r.json()
+        print repr(data)
         request.session["access_token"] = data["access_token"]
         request.session["refresh_token"] = data["refresh_token"]
         request.session["expires"] = data["expires"]
@@ -142,8 +144,16 @@ def login():
             "grant_type": "authorization_code",
             "response_type": "code",
             "client_id": CONFIG["client_id"],
-            "redirect_uri": CONFIG["redirect_uri"]
+            "redirect_uri": CONFIG["base_url"] + "/login"
         }))
+
+@get("/logout")
+def logout():
+    if get_access_token():
+        del request.session["access_token"]
+        del request.session["refresh_token"]
+        del request.session["expires"]
+    redirect("/")
 
 # API
 @get("/api/user")
@@ -247,14 +257,65 @@ def show_torrents(show_id):
             break
 
     for k, v in torrents.items():
-        torrents[k] = sorted(v.values(), key=lambda i: i["name"], reverse=True)
+        torrents[k] = sorted(v.values(), key=lambda i: i["uploaded"], reverse=True)
 
     return json.dumps(torrents)
 
 @delete("/api/show/<show_id>/torrents")
-def invalidate_torrents_cache(show_id):
+def invalidate_show_torrents(show_id):
     cache.invalidate(show_torrents, show_id)
     return ""
 
+@get("/api/user/<user_id>/rss")
+@force_positional_route("user_id")
+@cache.cache()
+def user_rss(user_id):
+    r = anilist("GET", "user/{}/animelist".format(user_id))
+    user = r.json()
+    shows = user["lists"].get("watching", []) + user["lists"].get("plan to watch", [])
+    torrents = []
+
+    for show in shows:
+        m = re.match(r"\[(.*?)\]", show["notes"] or "")
+        group = m.group(1) if m else None
+        if not group:
+            continue
+
+        r = requests.get("{}/api/show/{:d}/torrents".format(CONFIG["base_url"], show["anime"]["id"]))
+        d = r.json()
+
+        if group not in d:
+            continue
+        for torrent in d[group]:
+            if torrent["episode"] > show["episodes_watched"]:
+                torrents.append(torrent)
+
+    result = '<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">'
+    result += '<channel>'
+    result += '<title>Anilist Torrents for {}</title>'.format(escape(user["display_name"]))
+    result += '<link>{}</link>'.format(escape(CONFIG["base_url"]))
+    result += '<atom:link href="{}" rel="self" type="application/rss+xml" />'.format("{}/api/user/{:d}/rss".format(CONFIG["base_url"], user["id"]))
+    result += '<description />'
+
+    for t in sorted(torrents, key=lambda i: i["uploaded"], reverse=True):
+        result += '<item>'
+        result += '<title>{}</title>'.format(escape(t["name"]))
+        result += '<link>{}</link>'.format(escape(t["download"]))
+        result += '<guid>{}</guid>'.format(escape(t["info"]))
+        result += '<pubDate>{}</pubDate>'.format(escape(t["uploaded"]))
+        result += '<description><![CDATA[ {} ]]></description>'.format(json.dumps(t))
+        result += '</item>'
+
+    result += '</channel>'
+    result += '</rss>'
+
+    response.content_type = "application/rss+xml; charset=utf-8"
+    return result
+
+@delete("/api/user/<user_id>/rss")
+def invalidate_user_rss(user_id):
+    cache.invalidate(user_rss, user_id)
+    return ""
+
 if __name__ == "__main__":
-    run(app=app, host="0.0.0.0", port=8080, debug=True, reloader=True)
+    run(app=app, host="0.0.0.0", port=os.environ.get("PORT", 8080), debug=True, reloader=True)

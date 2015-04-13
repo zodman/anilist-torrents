@@ -40,8 +40,24 @@ a {
 }
 
 .title {
-    font-size: 64px;
+    margin-top: 20px;
     text-align: center;
+}
+.title-text,
+.title-text * {
+    display: inline;
+    margin: 0;
+    text-align: right;
+}
+.title-text {
+    display: inline-block;
+    vertical-align: middle;
+}
+.title h1 {
+    font-size: 64px;
+}
+.navbar a {
+    margin-left: 10px;
 }
 .title img {
     vertical-align: middle;

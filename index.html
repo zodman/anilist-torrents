@@ -29,10 +29,17 @@
       </div>
 
       <div ng-show="user">
-        <h1 class="title">
-          Torrents for {{user.display_name}}
+        <div class="title">
+          <div class="title-text">
+            <h1>Torrents for {{user.display_name}}</h1>
+            <br>
+            <p class="navbar">
+              <a href="/api/user/{{user.id}}/rss">RSS</a>
+              <a href="/logout">Logout</a>
+            </p>
+          </div>
           <img src="{{user.image_url_med}}">
-        </h1>
+        </div>
 
         <div class="show" ng-repeat="show in user.list | orderBy:'anime.title'" ng-class="{'no-groups': no_groups(show), 'no-episodes': no_episodes(show)}">
           <div class="show-title">
