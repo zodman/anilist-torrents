@@ -77,6 +77,9 @@ def get_access_token():
     if not ("access_token" in request.session and "refresh_token" in request.session and "expires" in request.session):
         return None
     if time.time() >= request.session["expires"] - 30: # Ensure we have 30 seconds of leeway
+        if not request.session["refresh_token"]:
+            return None
+
         r = requests.post("https://anilist.co/api/auth/access_token", {
             "grant_type": "refresh_token",
             "client_id": CONFIG["client_id"],
@@ -97,7 +100,10 @@ def search_names(name):
     # Strip numbers out, but only as a fallback
     # Also if there was a number, quote it, otherwise it'll match episode numbers
     name2 = re.sub(r"\b\d+\b", "", name)
-    names = [u'"{}"'.format(name), name2] if name != name2 else [name]
+    quote = name != name2 or "!" in name
+    names = [u'"{}"'.format(name)] if quote else [name]
+    if name != name2:
+        names.append(name2)
 
     return [re.sub(r"\s+", " ", n).strip() for n in names]
 
@@ -156,6 +162,13 @@ def logout():
     redirect("/")
 
 # API
+@get("/api/impersonate/<access_token>/<expires:int>")
+def impersonate(access_token, expires):
+    request.session["access_token"] = access_token
+    request.session["refresh_token"] = None
+    request.session["expires"] = expires
+    redirect("/")
+
 @get("/api/user")
 def current_user():
     if not get_access_token():
@@ -223,7 +236,7 @@ def show_torrents(show_id):
                         "uploaded": datetime.datetime.strptime(t.pubDate.string, "%a, %d %b %Y %H:%M:%S +0000").isoformat(" ")
                     }
                     # group = /^[(.*?)]/.match(name)
-                    if d["name"].startswith("["):
+                    if d["name"].startswith("[") and "]" in d["name"]:
                         d["group"] = d["name"][1:d["name"].index("]")]
                         m = re.search(r"\[(480|720|1080)[pP]?\]", d["name"])
                         if m:
@@ -251,6 +264,9 @@ def show_torrents(show_id):
 
                     torrents[d["group"]] = torrents.get(d["group"], {})
                     torrents[d["group"]][d["episode"]] = d
+
+            if offset > 10:
+                print "!!! WARNING !!! - Extremely high offset for {!r} = {:d}".format(term, offset)
 
         torrents.pop(None, None)
         if torrents:

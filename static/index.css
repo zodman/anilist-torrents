@@ -18,17 +18,26 @@ a {
     text-decoration: none;
 }
 
+.btn {
+    cursor: pointer;
+    padding: 2px 8px;
+    background: #DDD;
+    border: 3px solid #F0B080;
+}
+.btn.active {
+    border: 3px solid #98D9A8;
+}
+
 .a-plus {
     background: #60B0F0 !important;
 }
-
 .trusted {
     background: #98D9A8;
 }
-
 .remake {
     background: #F0B080;
 }
+
 
 .loading,
 .login {

@@ -1,4 +1,4 @@
-var app = angular.module("app", []);
+var app = angular.module("app", ["LocalStorageModule"]);
 
 // Wow, this is incredibly stupid. Way to go Angular!
 // https://github.com/angular/angular.js/issues/6039
@@ -12,7 +12,10 @@ app.config(function ($httpProvider) {
   };
 });
 
-app.controller("MainController", function ($scope, $http) {
+app.controller("MainController", function ($scope, $http, localStorageService) {
+  localStorageService.bind($scope, "only_airing");
+  localStorageService.bind($scope, "only_trusted");
+
   $scope.loading = true;
   $http.get("/api/user").success(function (data) {
     $scope.loading = false;
@@ -81,10 +84,18 @@ app.controller("MainController", function ($scope, $http) {
   };
 
   $scope.no_groups = function (show) {
-    return !show.loading && !show.groups.length;
+    return !show.loading && !show.groups.filter($scope.acceptable_group).length;
   };
 
   $scope.no_episodes = function (show) {
     return !show.loading && show.group && show.group.episodes.filter($scope.unwatched).length === 0;
+  };
+
+  $scope.acceptable_show = function (show) {
+    return !$scope.only_airing || show.anime.airing_status === "currently airing";
+  };
+
+  $scope.acceptable_group = function (group) {
+    return !$scope.only_trusted || group.trusted;
   };
 });
