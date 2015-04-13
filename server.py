@@ -296,6 +296,7 @@ def user_rss(user_id):
     result += '<link>{}</link>'.format(escape(CONFIG["base_url"]))
     result += '<atom:link href="{}" rel="self" type="application/rss+xml" />'.format("{}/api/user/{:d}/rss".format(CONFIG["base_url"], user["id"]))
     result += '<description />'
+    result += '<ttl>60</ttl>'
 
     for t in sorted(torrents, key=lambda i: i["uploaded"], reverse=True):
         result += '<item>'
