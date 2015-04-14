@@ -1,8 +1,8 @@
-var app = angular.module("app", ["LocalStorageModule"]);
+var app = angular.module("app", ["angular-locker"]);
 
 // Wow, this is incredibly stupid. Way to go Angular!
 // https://github.com/angular/angular.js/issues/6039
-app.config(function ($httpProvider) {
+app.config(function ($httpProvider, lockerProvider) {
   $httpProvider.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8";
   $httpProvider.defaults.transformRequest = function (d) {
     if (d === undefined) return d;
@@ -10,11 +10,13 @@ app.config(function ($httpProvider) {
     for (var p in d) s.push(encodeURIComponent(p) + "=" + encodeURIComponent(d[p]));
     return s.join("&");
   };
+
+  lockerProvider.setDefaultNamespace(false);
 });
 
-app.controller("MainController", function ($scope, $http, localStorageService) {
-  localStorageService.bind($scope, "only_airing");
-  localStorageService.bind($scope, "only_trusted");
+app.controller("MainController", function ($scope, $http, locker) {
+  locker.bind($scope, "only_airing");
+  locker.bind($scope, "only_trusted");
 
   $scope.loading = true;
   $http.get("/api/user").success(function (data) {
