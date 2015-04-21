@@ -308,7 +308,7 @@ def user_rss(user_id):
 
     result = '<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">'
     result += '<channel>'
-    result += '<title>Anilist Torrents for {}</title>'.format(escape(user["display_name"]))
+    result += '<title>Anilist Torrents for {}</title>'.format(escape(user["display_name"].encode("UTF-8")))
     result += '<link>{}</link>'.format(escape(CONFIG["base_url"]))
     result += '<atom:link href="{}" rel="self" type="application/rss+xml" />'.format("{}/api/user/{:d}/rss".format(CONFIG["base_url"], user["id"]))
     result += '<description />'
@@ -316,10 +316,10 @@ def user_rss(user_id):
 
     for t in sorted(torrents, key=lambda i: i["uploaded"], reverse=True):
         result += '<item>'
-        result += '<title>{}</title>'.format(escape(t["name"]))
-        result += '<link>{}</link>'.format(escape(t["download"]))
-        result += '<guid>{}</guid>'.format(escape(t["info"]))
-        result += '<pubDate>{}</pubDate>'.format(escape(t["uploaded"]))
+        result += '<title>{}</title>'.format(escape(t["name"].encode("UTF-8")))
+        result += '<link>{}</link>'.format(escape(t["download"].encode("UTF-8")))
+        result += '<guid>{}</guid>'.format(escape(t["info"].encode("UTF-8")))
+        result += '<pubDate>{}</pubDate>'.format(escape(t["uploaded"].encode("UTF-8")))
         result += '<description><![CDATA[ {} ]]></description>'.format(json.dumps(t))
         result += '</item>'
 
