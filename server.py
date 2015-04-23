@@ -22,6 +22,7 @@ from bottle import (abort, delete, get, hook, post, redirect, request,
 # Override Synonyms for when Anilist is just being dumb
 SYNONYMS = {
     20678: ["Shinmai Maou No Testament"],
+    20762: ["Knights of Sidonia: The Ninth Planet Crusade"],
 }
 
 # Initialize app
