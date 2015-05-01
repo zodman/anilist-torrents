@@ -361,4 +361,4 @@ def invalidate_user_rss(user_id):
     return ""
 
 if __name__ == "__main__":
-    run(app=app, host="0.0.0.0", port=os.environ.get("PORT", 8080), debug=True, reloader=True)
+    run(app=app, host="0.0.0.0", port=os.environ.get("PORT", 8080), debug=True, reloader=True, server="gunicorn")
