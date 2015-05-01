@@ -225,7 +225,7 @@ def show_torrents(show_id):
         print terms
         for term in set(terms):
             offset = 0
-            term = term + fansub
+            term = term + "+"+ fansub
             while True:
                 offset += 1
                 r = requests.get("http://www.nyaa.se/", params={
