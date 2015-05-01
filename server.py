@@ -211,7 +211,7 @@ def update_notes():
 
 @get("/api/show/<show_id>/torrents")
 @force_positional_route("show_id")
-#@cache.cache()
+@cache.cache()
 def show_torrents(show_id):
     r = anilist("GET", "anime/{}/page".format(show_id))
     data = r.json()
