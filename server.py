@@ -10,6 +10,8 @@ from functools import wraps
 from xml.sax.saxutils import escape
 
 import requests
+import requests_cache
+requests_cache.install_cache('animelistcache')
 from beaker.cache import CacheManager
 from beaker.middleware import SessionMiddleware
 from beaker.util import parse_cache_config_options
@@ -29,7 +31,7 @@ SYNONYMS = {
 ACCESS_TOKEN = None
 ACCESS_EXPIRES = 0
 with open("config.json", "r") as f:
-    CONFIG = json.load(f)
+    CONFIG = json.loads(f.read())
 
 app = SessionMiddleware(app_factory(), {
     "session.type": "cookie", # Store everything in a cookie
@@ -216,15 +218,26 @@ def show_torrents(show_id):
     for r in data["relations"]:
         if r["relation_type"] == "prequel":
             fallback_fix += r["total_episodes"]
-
+    fansub="|".join(["hoshizora","misubs","puyasubs","LRL","spanish"])
     torrents = {}
+
     for terms, fallback in queries:
         print terms
         for term in set(terms):
             offset = 0
+            term = term + fansub
             while True:
                 offset += 1
-                r = requests.get("http://www.nyaa.se/", params={"page": "rss", "cats": "1_37", "term": term, "offset": offset})
+                r = requests.get("http://www.nyaa.se/", params={
+                        "page": "rss", 
+                        "cats": "1_38", 
+                        "term": term, 
+                        "minage":"",
+                        "maxage":"",
+                        "minsize":"",
+                        "maxsize":"",
+                        "offset": offset})
+                print r.url
                 items = BeautifulSoup(r.text, "xml").find_all("item")
                 if not items:
                     break
