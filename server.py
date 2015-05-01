@@ -86,7 +86,7 @@ def ensure_current_access_token():
     print ACCESS_TOKEN
 
 def get_access_token():
-    print request.session
+    #print request.session
     if not ("access_token" in request.session and "refresh_token" in request.session and "expires" in request.session):
         return None
     if time.time() >= request.session["expires"] - 30: # Ensure we have 30 seconds of leeway
@@ -211,7 +211,7 @@ def update_notes():
 
 @get("/api/show/<show_id>/torrents")
 @force_positional_route("show_id")
-@cache.cache()
+#@cache.cache()
 def show_torrents(show_id):
     r = anilist("GET", "anime/{}/page".format(show_id))
     data = r.json()
@@ -234,7 +234,7 @@ def show_torrents(show_id):
     for r in data["relations"]:
         if r["relation_type"] == "prequel":
             fallback_fix += r["total_episodes"]
-    fansub="|".join(fansubs)
+    fansub="-".join(fansubs)
     exclude = "-".join(ignores)
     torrents = {}
 
@@ -242,12 +242,13 @@ def show_torrents(show_id):
         print terms
         for term in set(terms):
             offset = 0
-            term = term + "+"+ fansub
+            term = term 
             while True:
                 offset += 1
                 r = requests.get("http://www.nyaa.se/", params={
                         "page": "rss", 
-                        "cats": "1_38", 
+                        "user": fansub,
+                        "exclude": exclude,
                         "term": term, 
                         "minage":"",
                         "maxage":"",
@@ -259,6 +260,7 @@ def show_torrents(show_id):
                 if not items:
                     break
                 for t in items:
+                    
                     d = {
                         "name": t.title.string,
                         "group": None,
@@ -282,7 +284,8 @@ def show_torrents(show_id):
                         d["episode"] -= fallback_fix
                         if d["episode"] <= 0:
                             continue
-
+                    if d["episode"] is None:
+                        d["episode"] = "BATCH"
                     metadata = t.description.string.split(" - ")
                     metadata[0] = [int(x.split(" ")[0]) for x in metadata[0].split(", ")]
                     d["seeders"] = metadata[0][0]
@@ -295,7 +298,7 @@ def show_torrents(show_id):
 
                     torrents[d["group"]] = torrents.get(d["group"], {})
                     torrents[d["group"]][d["episode"]] = d
-
+                    #print (d["group"], t.title.string)
             if offset > 10:
                 print "!!! WARNING !!! - Extremely high offset for {!r} = {:d}".format(term, offset)
 

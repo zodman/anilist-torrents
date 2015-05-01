@@ -72,7 +72,7 @@
             </div>
 
             <div class="show-episodes" ng-show="show.group">
-              <div ng-repeat="episode in show.group.episodes | filter:unwatched | orderBy:'-uploaded'">
+              <div ng-repeat="episode in show.group.episodes |  orderBy:'-uploaded'">
                 <a class="show-episode" href="{{episode.download}}" ng-class="{'a-plus': episode.a_plus, 'trusted': episode.trusted, 'remake': episode.remake}">
                   <strong>{{episode.name}}</strong>
                   <em>{{episode.downloads | number}}</em>

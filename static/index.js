@@ -23,19 +23,30 @@ app.controller("MainController", function ($scope, $http, locker) {
     $scope.loading = false;
     $scope.user = data;
     _.each($scope.user.list, function (show, index) {
+
+        
       // Compute title for each show based on user preferences
       Object.defineProperty(show.anime, "title", {
         get: function () {
           return this["title_" + $scope.user.title_language];
         }
       });
+
+
       // Compute group for each show based on "notes", which is the only state we can manipulate
       Object.defineProperty(show, "group", {
         get: function () {
+ 
           var group = /^\[(.*?)\]/.exec(this.notes);
-          if (!group) return null;
+          if (!group) {
+ 
+            return null;
+          }
+            
 
-          return _.find(this.groups, "name", group[1]);
+          found = _.find(this.groups, "name", group[1]);
+          
+          return found
         },
         set: function (group) {
           var notes = /^(?:\[(.*?)\])?(.*)/.exec(this.notes || "")[2];
@@ -82,6 +93,8 @@ app.controller("MainController", function ($scope, $http, locker) {
   });
 
   $scope.unwatched = function (value, index, arr) {
+    console.log("test",value.episode, value.show.episodes_watched, value.episode > value.show.episodes_watched);
+    return true;
     return value.episode > value.show.episodes_watched;
   };
 
