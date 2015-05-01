@@ -35,6 +35,10 @@ with open("config.json", "r") as f:
 with open("fansub.json", "r") as f:
     fansubs = json.loads(f.read())
 
+with open("ignores.json", "r") as f:
+    ignores = json.loads(f.read())
+
+
 requests_cache.install_cache('animelistcache',backend=CONFIG.setdefault("request_backend","sqlite"), expire_after=1600)
 app = SessionMiddleware(app_factory(), {
     "session.type": "cookie", # Store everything in a cookie
@@ -231,6 +235,7 @@ def show_torrents(show_id):
         if r["relation_type"] == "prequel":
             fallback_fix += r["total_episodes"]
     fansub="|".join(fansubs)
+    exclude = "-".join(ignores)
     torrents = {}
 
     for terms, fallback in queries:
@@ -361,4 +366,4 @@ def invalidate_user_rss(user_id):
     return ""
 
 if __name__ == "__main__":
-    run(app=app, host="0.0.0.0", port=os.environ.get("PORT", 8080), debug=True, reloader=True, server="gunicorn")
+    run(app=app, host="127.0.0.1", port=os.environ.get("PORT", 8080), debug=True, reloader=True, server="gunicorn")
