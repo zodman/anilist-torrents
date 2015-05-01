@@ -10,7 +10,7 @@ from functools import wraps
 from xml.sax.saxutils import escape
 
 import requests
-import requests_cache
+
 
 from beaker.cache import CacheManager
 from beaker.middleware import SessionMiddleware
@@ -39,7 +39,7 @@ with open("ignores.json", "r") as f:
     ignores = json.loads(f.read())
 
 
-requests_cache.install_cache('animelistcache',backend=CONFIG.setdefault("request_backend","sqlite"), expire_after=1600)
+
 app = SessionMiddleware(app_factory(), {
     "session.type": "cookie", # Store everything in a cookie
     "session.auto": True, # Auto-save the session (we would do so anyway since it's a cookie)
@@ -94,18 +94,18 @@ def get_access_token():
             return None
 
 
-        with requests_cache.disabled():
-            r = requests.post("https://anilist.co/api/auth/access_token", {
-                "grant_type": "refresh_token",
-                "client_id": CONFIG["client_id"],
-                "client_secret": CONFIG["client_secret"],
-                "refresh_token": request.session["refresh_token"]
-            }, verify=False)
-            data = r.json()
-            if "error" in data and data["error"]=="invalid_request":
-                return None
-            request.session["access_token"] = data["access_token"]
-            request.session["expires"] = data["expires"]
+    
+        r = requests.post("https://anilist.co/api/auth/access_token", {
+            "grant_type": "refresh_token",
+            "client_id": CONFIG["client_id"],
+            "client_secret": CONFIG["client_secret"],
+            "refresh_token": request.session["refresh_token"]
+        }, verify=False)
+        data = r.json()
+        if "error" in data and data["error"]=="invalid_request":
+            return None
+        request.session["access_token"] = data["access_token"]
+        request.session["expires"] = data["expires"]
     return request.session["access_token"]
 
 def search_names(name):
@@ -145,32 +145,32 @@ def index():
 
 @get("/login")
 def login():
-    with requests_cache.disabled():
-        code = request.params.code
-        if code:
-            
-            r = requests.post("https://anilist.co/api/auth/access_token", {
-                    "grant_type": "authorization_code",
-                    "client_id": CONFIG["client_id"],
-                    "client_secret": CONFIG["client_secret"],
-                    "redirect_uri": CONFIG["base_url"] + "/login",
-                    "code": code
-                }, verify=False)
-            data = r.json()
-            print repr(data)
-            request.session["access_token"] = data["access_token"]
-            request.session["refresh_token"] = data["refresh_token"]
-            request.session["expires"] = data["expires"]
 
-        if get_access_token():
-            redirect("/")
-        else:
-            redirect("https://anilist.co/api/auth/authorize?" + urllib.urlencode({
+    code = request.params.code
+    if code:
+        
+        r = requests.post("https://anilist.co/api/auth/access_token", {
                 "grant_type": "authorization_code",
-                "response_type": "code",
                 "client_id": CONFIG["client_id"],
-                "redirect_uri": CONFIG["base_url"] + "/login"
-            }))
+                "client_secret": CONFIG["client_secret"],
+                "redirect_uri": CONFIG["base_url"] + "/login",
+                "code": code
+            }, verify=False)
+        data = r.json()
+        print repr(data)
+        request.session["access_token"] = data["access_token"]
+        request.session["refresh_token"] = data["refresh_token"]
+        request.session["expires"] = data["expires"]
+
+    if get_access_token():
+        redirect("/")
+    else:
+        redirect("https://anilist.co/api/auth/authorize?" + urllib.urlencode({
+            "grant_type": "authorization_code",
+            "response_type": "code",
+            "client_id": CONFIG["client_id"],
+            "redirect_uri": CONFIG["base_url"] + "/login"
+        }))
 
 @get("/logout")
 def logout():
